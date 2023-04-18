@@ -20,7 +20,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 
 from datetime import datetime
 from copy import copy, deepcopy
-from typing import Union
+from typing import Union, List, Dict, Any
 import logging
 import json
 import bson
@@ -180,7 +180,7 @@ class Document(BaseDict):
         return json.dumps(json_dict)
 
     @classmethod
-    def create_index(cls, keys: list[str], index_type: str = 'asc', unique: bool = False, name: Union[str, None] = None) -> None:
+    def create_index(cls, keys: List[str], index_type: str = 'asc', unique: bool = False, name: Union[str, None] = None) -> None:
         """
         Creates an index on the specified keys
         :param keys: The keys to index on
@@ -218,7 +218,7 @@ class Document(BaseDict):
             return None
 
     @classmethod
-    def insert_many(cls, items: list[dict]) -> None:
+    def insert_many(cls, items: List[dict]) -> None:
         """
         Inserts a list of dictionaries into the database
         :param items: list of dict, items to insert
