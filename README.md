@@ -171,6 +171,40 @@ User = create_document_class('User', 'users')
 User.create_index('name', unique=True)
 ```
 
+### Other uses
+When you create the document class you have an option to pass additional bases classes. You can use this feature to add functionality to the generated class.
+
+This can also be useful if you want to use Mongeasy with for example flask-login.
+
+```python
+from flask import Flask
+from flask_login import UserMixin, LoginManager
+from mongeasy import create_document_class
+from bson import ObjectId
+
+login_manager = LoginManager()
+# Create User class with mongeasy and UserMixin from flask_login as a base class
+User = create_document_class('User', 'users', base_classes=(UserMixin,))
+def get_id(self):
+    return str(self._id)
+# Add get_id method to User class
+User.get_id = get_id
+
+
+def create_app():
+    app = Flask(__name__)
+   # Define the user loader function for Flask-Login
+    @login_manager.user_loader
+    def load_user(user_id):
+        # Load the user object from the database using the user_id
+        user_id = ObjectId(user_id)
+        user = User.find(_id=user_id).first()
+        return user
+
+    return app
+
+```
+
 ### ResultList
 All queries that can return more than one document will return a `ResultList` object. This object can be used to get the first or last document in the list, or None if no document is found.
 
@@ -197,7 +231,7 @@ There are also other methods on the `ResultList` object that can be used. These 
 * `map` - Apply a given function to each element in the list and return a new ResultList containing the results
 * `filter` - Filter the list using a given function and return a new ResultList containing the results
 * `reduce` - Apply a given function to each element in the list and return a single value
-* 'group_by` - Group the list by a given key and return a dict with the results grouped by the key
+* `group_by` - Group the list by a given key and return a dict with the results grouped by the key
 * `random` - Get a random document from the list or None if no document is found
 
 

@@ -2,7 +2,7 @@
 
 __author__ = """Joakim Wassberg"""
 __email__ = 'joakim.wassberg@arthead.se'
-__version__ = '0.1.0'
+__version__ = '0.1.5'
 
 import os
 import configparser

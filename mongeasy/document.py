@@ -265,6 +265,15 @@ class Document(BaseDict):
         return ResultList(cls(item) for item in cls.collection.find({}))
 
     @classmethod
+    def all_iter(cls) -> dict:
+        """
+        Retrieve all documents from the collection as an iterator
+        :yields: dict representation of next document
+        """
+        for item in cls.collection.find({}):
+            yield cls(**item)
+
+    @classmethod
     def delete(cls, *args, **kwargs) -> None:
         """
         Delete the document that matches the keywords

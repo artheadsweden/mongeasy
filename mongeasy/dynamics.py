@@ -24,16 +24,13 @@ from .document import Document
 from .exceptions import MongEasyValidationException, MongEasyFieldError
 
 
-def create_document_class(class_name: str, collection_name: str = None, schema: Union[dict, None] = None, base_classes: tuple = ()):
+def create_document_class(class_name: str, collection_name: str = None, base_classes: tuple = ()):
     """
     Dynamically create a document class and register it in the calling module's namespace.
     Args:
         class_name (str): Name of the class to create.
         collection_name (str, optional): Name of the collection. Defaults to None. 
             If None, the collection name will be the snake_case version of the class name with an 's' appended.
-        schema (Union[dict, BaseModel, None], optional): _description_. An optinal schema to be used. 
-            This can either be in Mongeasy format or Pydantic.  Defaults to None.
-            If None this docuemnt will be schemaless.
         base_classes (tuple, optional): Optional base classes to be added to the document class. Defaults to ().
 
     Returns:
