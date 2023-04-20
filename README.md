@@ -12,7 +12,7 @@ pip install mongeasy
 ### What's new in version 0.1.7?
 * Documents now support raw queries using the `raw_query` method. This method will return a pymongo cursor object that can be used to iterate over the documents in the collection.
 * Documents now support raw aggregation using the `raw_aggregate` method. This method will return a pymongo cursor object that can be used to iterate over the documents in the collection.
-* Extended the Query class to supprt more operators
+* Extended the Query class to support more operators
 
 ### Connection
 Connection to the database is handled automtically for you if you have the conenction information in a configfile or set as environment variables.
