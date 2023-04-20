@@ -181,6 +181,32 @@ class Document(BaseDict):
         return json.dumps(json_dict)
 
     @classmethod
+    def raw_query(cls, query: Union[Dict, Query], *args, **kwargs) -> pymongo.cursor.Cursor:
+        """
+        Performs a raw query on the collection
+        :param query: The query to perform
+        :return: Cursor, the cursor to the query results
+        """
+        if isinstance(query, Query):
+            query = query.to_mongo_query()
+        if cls.collection is None:
+            raise MongeasyDBCollectionError('The collection does not exist')
+
+        return cls.collection.find(query, *args, **kwargs)
+
+    @classmethod
+    def raw_aggregate(cls, pipeline: List[Dict], *args, **kwargs) -> pymongo.cursor.Cursor:
+        """
+        Performs a raw aggregation on the collection
+        :param pipeline: The aggregation pipeline to perform
+        :return: Cursor, the cursor to the aggregation results
+        """
+        if cls.collection is None:
+            raise MongeasyDBCollectionError('The collection does not exist')
+
+        return cls.collection.aggregate(pipeline, *args, **kwargs)
+
+    @classmethod
     def create_index(cls, keys: List[str], index_type: str = 'asc', unique: bool = False, name: Union[str, None] = None) -> None:
         """
         Creates an index on the specified keys

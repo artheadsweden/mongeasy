@@ -28,9 +28,20 @@ class Query:
                 ast.LtE: '$lte',
                 ast.Gt: '$gt',
                 ast.GtE: '$gte',
+                ast.In: '$regex',
+                ast.NotIn: '$nin'
             }
             op = op_map[type(node.ops[0])]
-            return {left: {op: right}}
+            if op == '$regex':
+                return {left: {op: f'.*{right}.*'}}
+            elif isinstance(node, ast.Compare) and isinstance(node.ops[0], ast.NotIn):
+                left = self._transform(node.left)
+                #right = [self._transform(value) for value in node.comparators]
+                return {right: {'$not': {'$regex': '|'.join(left)}}}
+            elif isinstance(right, list):
+                return {left: {op: right}}
+            else:
+                return {left: {op: [right]}}
         elif isinstance(node, ast.Name):
             return node.id
         elif isinstance(node, ast.Str):

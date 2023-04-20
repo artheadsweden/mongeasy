@@ -2,7 +2,7 @@
 
 __author__ = """Joakim Wassberg"""
 __email__ = 'joakim.wassberg@arthead.se'
-__version__ = '0.1.5'
+__version__ = '0.1.7'
 
 from mongeasy.connection import MongeasyConnection
 from mongeasy.exceptions import MongeasyDBConnectionError

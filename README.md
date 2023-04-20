@@ -2,6 +2,18 @@
 
 Mongeasy is a easy to use library to be used for simple access to a MongoDB database, without any need for schemas or validation. Just store the data as it is used in your application.
 
+### Installation
+Mongoeasy is available on PyPI and can be installed using pip:
+
+```bash
+pip install mongeasy
+```
+
+### What's new in version 0.1.7?
+* Documents now support raw queries using the `raw_query` method. This method will return a pymongo cursor object that can be used to iterate over the documents in the collection.
+* Documents now support raw aggregation using the `raw_aggregate` method. This method will return a pymongo cursor object that can be used to iterate over the documents in the collection.
+* Extended the Query class to supprt more operators
+
 ### Connection
 Connection to the database is handled automtically for you if you have the conenction information in a configfile or set as environment variables.
 
@@ -215,15 +227,36 @@ query = {'$or': [{'$or': [{'name': {'$eq': 'John'}}, {'age': {'$lt': 40}}]}, {'$
 you can accomplish the same thing by using the Query object
 
 ```python
+from mongeasy.core import Query
+
+
 query = Query('(name == "John" or age < 40) or (name == "Jane" and age > 20)')
 ```
 
 The query can then be used in your queries like this:
 
 ```python
+from mongeasy import create_document_class
+from mongeasy.core import Query
+
+
+User = create_document_class('User', 'users')
+query = Query('(name == "John" or age < 40) or (name == "Jane" and age > 20)')
 result = User.find(query)
 ```
 
+Supported operators are:
+* ==
+* !=
+* <
+* >
+* <=
+* >=
+* and
+* or
+* not
+* in
+* not in
 
 ### ResultList
 All queries that can return more than one document will return a `ResultList` object. This object can be used to get the first or last document in the list, or None if no document is found.
@@ -253,6 +286,25 @@ There are also other methods on the `ResultList` object that can be used. These 
 * `reduce` - Apply a given function to each element in the list and return a single value
 * `group_by` - Group the list by a given key and return a dict with the results grouped by the key
 * `random` - Get a random document from the list or None if no document is found
+
+### Planned features
+* Enable lazy-loading of query results and support for query chaining
+* Implement a schema plugin system to allow for validation and type checking of documents
+* Add support for transactions using resource management
+* Implement logging and profiling to aid with debugging and performance tuning
+* Enable asynchronous I/O support for improved scalability
+* Implement caching with customizable caching strategies
+* Add support for background tasks using a task queue
+* Implement a paginator utility to allow for pagination of query results
+* Support for MongoDB Atlas search
+* Data migration and seeding utilities
+* Real-time sync feature for monitoring and syncing with another database
+* Automatic data splitting for large documents approaching the 16 MB limit
+* Support for SQL-style auto-increment fields
+* Middleware support for request/response processing
+* Integration with machine learning libraries for data analysis and prediction
+* Built-in analytics to provide insights into database usage and performance
+* Visualization tools to aid with data exploration and presentation
 
 
 ### Contributing
