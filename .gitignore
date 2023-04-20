@@ -28,3 +28,7 @@ Thumbs.db
 dist/
 Mongeasy.egg-info/
 pytest_cache/
+
+
+driver.py
+mongeasy_config.yaml

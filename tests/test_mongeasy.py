@@ -132,10 +132,10 @@ def test_document_reload_existing_document(clean_mongo):
 
 
 def test_document_reload_unsaved_document(clean_mongo):
-    from mongeasy.exceptions import MongEasyDBDocumentError
+    from mongeasy.exceptions import MongeasyDBDocumentError
     User = create_document_class('User', 'users')
     user = User({'first_name': 'John', 'last_name': 'Doe', 'age': 30})
-    with pytest.raises(MongEasyDBDocumentError):
+    with pytest.raises(MongeasyDBDocumentError):
         user.reload()
 
 def test_document_delete_field(clean_mongo):

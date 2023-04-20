@@ -19,41 +19,41 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 """
 
 
-class MongEasyException(Exception):
+class MongeasyException(Exception):
     """
     Base exception class
     """
 
 
-class MongEasyDBConnectionError(MongEasyException):
+class MongeasyDBConnectionError(MongeasyException):
     """
     Database initialization exceptions
     """
 
 
-class MongEasyDBCollectionError(MongEasyException):
+class MongeasyDBCollectionError(MongeasyException):
     """
     Collection exceptions
     """
 
 
-class MongEasyDBDocumentError(MongEasyException):
+class MongeasyDBDocumentError(MongeasyException):
     """
     Document exceptions
     """
 
 
-class MongEasyFieldError(MongEasyException):
+class MongeasyFieldError(MongeasyException):
     """
     Field exceptions
     """
     
-class MongEasyValidationException(MongEasyException):
+class MongeasyValidationException(MongeasyException):
     """
     Validation exceptions
     """
     
-class MongEasyIndexException(MongEasyException):
+class MongeasyIndexException(MongeasyException):
     """
     Index exceptions
     """

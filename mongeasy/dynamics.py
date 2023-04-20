@@ -19,9 +19,9 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 """
 import inspect
 from typing import Union
-from .utils import pascal_to_snake
+from .utils.utils import pascal_to_snake
 from .document import Document
-from .exceptions import MongEasyValidationException, MongEasyFieldError
+from .exceptions import MongeasyValidationException, MongeasyFieldError
 
 
 def create_document_class(class_name: str, collection_name: str = None, base_classes: tuple = ()):
@@ -46,11 +46,11 @@ def create_document_class(class_name: str, collection_name: str = None, base_cla
         collection_name = pascal_to_snake(class_name) + 's'
     
     # Create the collection object
-    collection = connection[collection_name]
+    collection = connection.db[collection_name]
     
-    doc_class = type(class_name, base_classes + (Document,), {'collection':collection})
+    doc_class = type(class_name, base_classes + (Document, ), {'collection':collection})
 
     # Register the document class in the calling module's namespace
     setattr(calling_module, class_name, doc_class)
-
+    
     return doc_class
