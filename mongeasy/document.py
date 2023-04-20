@@ -24,8 +24,9 @@ from typing import Union, List, Dict, Any
 import logging
 import json
 import bson
-from .exceptions import MongEasyDBCollectionError, MongEasyFieldError, MongEasyDBDocumentError, MongEasyIndexException
+from .exceptions import MongeasyDBCollectionError, MongeasyFieldError, MongeasyDBDocumentError, MongeasyIndexException
 from .base_dict import BaseDict
+from .core import Query
 from .resultlist import ResultList
 import pymongo
 
@@ -55,7 +56,7 @@ class Document(BaseDict):
             try:
                 self._id = bson.ObjectId(str(as_dict['_id']))
             except bson.errors.InvalidId:
-                raise MongEasyFieldError(f'Invalid _id: {as_dict["_id"]}')
+                raise MongeasyFieldError(f'Invalid _id: {as_dict["_id"]}')
 
         # Update the object
         self.__dict__.update(as_dict)
@@ -95,7 +96,7 @@ class Document(BaseDict):
         """
         if self.collection is None:
             Document.logger.error("The collection does not exist")
-            raise MongEasyDBCollectionError('The collection does not exist')
+            raise MongeasyDBCollectionError('The collection does not exist')
 
         # If _id is None, this is a new document
         if self._id is None:
@@ -112,7 +113,7 @@ class Document(BaseDict):
         update_result = self.collection.update_one({'_id': self._id}, {'$set': changed_fields})
         if update_result.matched_count == 0:
             Document.logger.error(f"Document with _id {self._id} does not exist")
-            raise MongEasyDBDocumentError(f"Document with _id {self._id} does not exist")
+            raise MongeasyDBDocumentError(f"Document with _id {self._id} does not exist")
         else:
             return self
 
@@ -121,12 +122,12 @@ class Document(BaseDict):
         Fetches the latest state of the document from the database and updates the current instance with the changes.
         """
         if self._id is None:
-            raise MongEasyDBDocumentError('Cannot reload unsaved document')
+            raise MongeasyDBDocumentError('Cannot reload unsaved document')
 
         # fetch the latest state of the document from the database
         db_doc = self.collection.find_one({'_id': self._id})
         if db_doc is None:
-            raise MongEasyDBDocumentError(f"Document with _id {self._id} does not exist")
+            raise MongeasyDBDocumentError(f"Document with _id {self._id} does not exist")
 
         self_before_reload = deepcopy(self)
         # update the current instance with the changes
@@ -157,10 +158,10 @@ class Document(BaseDict):
         :return: None
         """
         if self.collection is None:
-            raise MongEasyDBCollectionError('The collection does not exist')
+            raise MongeasyDBCollectionError('The collection does not exist')
 
         if self._id is None:
-            raise MongEasyDBDocumentError('Cannot delete unsaved document')
+            raise MongeasyDBDocumentError('Cannot delete unsaved document')
 
         self.collection.delete_one({'_id': self._id})
 
@@ -191,15 +192,15 @@ class Document(BaseDict):
         """
         # Check that keys is a non-empty list of strings
         if not isinstance(keys, list) or not all(isinstance(key, str) for key in keys) or len(keys) == 0:
-            raise MongEasyIndexException('keys must be a non-empty list of strings')
+            raise MongeasyIndexException('keys must be a non-empty list of strings')
 
         # Check that index_type is either 'asc' or 'desc'
         if index_type not in ['asc', 'desc']:
-            raise MongEasyIndexException('index_type must be either "asc" or "desc"')
+            raise MongeasyIndexException('index_type must be either "asc" or "desc"')
 
         # Check that name is either None or a non-empty string
         if name is not None and not isinstance(name, str):
-            raise MongEasyIndexException('name must be either None or a non-empty string')
+            raise MongeasyIndexException('name must be either None or a non-empty string')
 
         index_name = name or '_'.join(keys) + '_' + index_type.lower()
         index_type = pymongo.ASCENDING if index_type == 'asc' else pymongo.DESCENDING
@@ -241,6 +242,8 @@ class Document(BaseDict):
         # Handle positional arguments
         if len(args) == 1 and isinstance(args[0], dict):
             as_dict = copy(args[0])
+        if len(args) == 1 and isinstance(args[0], Query):
+            as_dict = args[0].to_mongo_query()
         elif len(args) == 0:
             as_dict = copy(kwargs)
 

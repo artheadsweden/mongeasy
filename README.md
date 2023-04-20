@@ -204,6 +204,26 @@ def create_app():
     return app
 
 ```
+### Query objects
+To simplify queries to the database you can use the mongeasy query object. You construct it and make your query using normal python syntax.
+
+Instead of using a mongodb query like this
+```python
+query = {'$or': [{'$or': [{'name': {'$eq': 'John'}}, {'age': {'$lt': 40}}]}, {'$and': [{'name': {'$eq': 'Jane'}}, {'age': {'$gt': 20}}]}]}
+```
+
+you can accomplish the same thing by using the Query object
+
+```python
+query = Query('(name == "John" or age < 40) or (name == "Jane" and age > 20)')
+```
+
+The query can then be used in your queries like this:
+
+```python
+result = User.find(query)
+```
+
 
 ### ResultList
 All queries that can return more than one document will return a `ResultList` object. This object can be used to get the first or last document in the list, or None if no document is found.

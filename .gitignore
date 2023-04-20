@@ -24,3 +24,11 @@ venv/
 # System files
 .DS_Store
 Thumbs.db
+
+dist/
+Mongeasy.egg-info/
+pytest_cache/
+
+
+driver.py
+mongeasy_config.yaml
