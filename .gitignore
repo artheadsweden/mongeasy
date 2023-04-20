@@ -24,3 +24,7 @@ venv/
 # System files
 .DS_Store
 Thumbs.db
+
+dist/
+Mongeasy.egg-info/
+pytest_cache/
