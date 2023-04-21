@@ -18,14 +18,14 @@ pip install mongeasy
 Connection to the database is handled automtically for you if you have the conenction information in a configfile or set as environment variables.
 
 #### Connection using configfile
-Create a file called `mongeasy.conf` and place it in your project root folder.
+Create a file called `mongeasy_config.yml` and place it in your project root folder.
 
 The contents of the file should be:
 
 ```bash
-[mongoeasy]
-connection_string = mongodb://localhost:27017/
-database_name = mydatabase
+db_config:
+  uri: mongodb://localhost:27017
+  database: mydatabase
 ```
 
 #### Connection using environment variables
