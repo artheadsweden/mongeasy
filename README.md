@@ -9,6 +9,9 @@ Mongoeasy is available on PyPI and can be installed using pip:
 pip install mongeasy
 ```
 
+### Documentation
+The documentation can be found at [https://mongeasy.readthedocs.io](https://mongeasy.readthedocs.io)
+
 ### What's new in version 0.1.7?
 * Documents now support raw queries using the `raw_query` method. This method will return a pymongo cursor object that can be used to iterate over the documents in the collection.
 * Documents now support raw aggregation using the `raw_aggregate` method. This method will return a pymongo cursor object that can be used to iterate over the documents in the collection.
