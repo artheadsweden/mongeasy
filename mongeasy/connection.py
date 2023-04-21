@@ -54,5 +54,17 @@ class MongeasyConnection:
             if self.connection_options is None:
                 self.connection_options = db_config.get('connection_options', None)
 
+    def connect(self, uri=None, database=None, connection_options=None):
+        if uri is not None:
+            self.uri = uri
+        if database is not None:
+            self.database = database
+        if connection_options is not None:
+            self.connection_options = connection_options
+
+        self.client = pymongo.MongoClient(self.uri, **self.connection_options)
+        self.db = self.client[self.database]
+        return self.db
+
     def disconnect(self):
         self.client.close()

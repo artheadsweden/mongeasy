@@ -252,9 +252,9 @@ Supported operators are:
 * ==
 * !=
 * <
-* >
+* \>
 * <=
-* >=
+* \>=
 * and
 * or
 * not

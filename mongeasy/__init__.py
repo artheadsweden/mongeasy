@@ -2,7 +2,7 @@
 
 __author__ = """Joakim Wassberg"""
 __email__ = 'joakim.wassberg@arthead.se'
-__version__ = '0.1.7'
+__version__ = '0.1.8'
 
 from mongeasy.connection import MongeasyConnection
 from mongeasy.exceptions import MongeasyDBConnectionError
@@ -10,6 +10,8 @@ from mongeasy.dynamics import create_document_class
 
 connection = MongeasyConnection()
 
+def connect(connection_str: str=None, db_name: str=None):
+    connection.connect(connection_str, db_name)
 # connection = None
 
 
