@@ -38,7 +38,7 @@ class MongeasyConnection:
             self.connection_options = os.environ.get('MONGOEASY_CONNECTION_OPTIONS')
 
     def check_conf_file(self):
-        config_path = os.path.join(os.getcwd(), 'mongeasy_config.yaml')
+        config_path = os.path.join(os.getcwd(), 'mongeasy_config.yml')
 
         # Check if the configuration file exists
         if os.path.exists(config_path):

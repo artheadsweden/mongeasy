@@ -27,6 +27,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Topic :: Database",
     ],
     packages=find_packages(),
     install_requires=["pymongo>=4.3.3"],

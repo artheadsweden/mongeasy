@@ -33,7 +33,9 @@ class Query:
             }
             op = op_map[type(node.ops[0])]
             if op == '$regex':
-                return {left: {op: f'.*{right}.*'}}
+                if isinstance(right, list):
+                    return {left: {'$in': right}}
+                return {right: {op: f'.*{left}.*'}}
             elif isinstance(node, ast.Compare) and isinstance(node.ops[0], ast.NotIn):
                 left = self._transform(node.left)
                 #right = [self._transform(value) for value in node.comparators]
@@ -42,11 +44,18 @@ class Query:
                 return {left: {op: right}}
             else:
                 return {left: {op: [right]}}
+        # elif isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Invert):
+        #     return {'$regex': self._transform(node.operand)}
         elif isinstance(node, ast.Name):
             return node.id
         elif isinstance(node, ast.Str):
             return node.s
         elif isinstance(node, ast.Num):
             return node.n
+        elif isinstance(node, ast.List):
+            return [self._transform(n) for n in node.elts]
+        elif isinstance(node, ast.Call):
+            if node.func.id == 'exists':
+                return { node.args[0].id: {'$exists': True}}
         else:
             raise ValueError(f'Unsupported node type: {type(node)}')

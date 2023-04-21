@@ -1,0 +1,17 @@
+site_name: Mongeasy
+site_url: https://github.com/artheadsweden/mongeasy
+nav:
+  - Home: index.md
+  - Installation: install.md
+  - Connection: connection.md
+  - Document Class: doc_class.md
+  - Create and Store: create.md
+  - Basic Queries: basic_queries.md
+  - Queries using the Query Class: query_class.md
+  - Raw Queries: raw_queries.md
+  - Aggrigation Pipelines: raw_pipelines.md
+  - Updateing Documents: update.md
+  - Deleteing Documents: delete.md
+  - Working with Indexes: indexes.md
+  - Working with results: result.md
+theme: readthedocs
