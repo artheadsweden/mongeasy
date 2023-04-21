@@ -39,3 +39,12 @@ MONGOEASY_DATABASE_NAME=mydatabase
 
 ## Automatic connection
 If any of these two options are used, Mongeasy will automatically connect to the database when you use the library. 
+
+## Manual connection
+If you want to manually handle the connection to the database, you can do so by using the `connect()` method. This method takes the same arguments as the `MongoClient` constructor in the pymongo library.
+
+```python
+from mongeasy import connect
+
+connect('mongodb://localhost:27017/', 'mydatabase')
+```
