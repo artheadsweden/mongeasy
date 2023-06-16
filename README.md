@@ -12,10 +12,8 @@ pip install mongeasy
 ### Documentation
 The documentation can be found at [https://mongeasy.readthedocs.io](https://mongeasy.readthedocs.io)
 
-### What's new in version 0.1.7?
-* Documents now support raw queries using the `raw_query` method. This method will return a pymongo cursor object that can be used to iterate over the documents in the collection.
-* Documents now support raw aggregation using the `raw_aggregate` method. This method will return a pymongo cursor object that can be used to iterate over the documents in the collection.
-* Extended the Query class to support more operators
+### What's new in version 0.1.9?
+* Improvement and bugfixes for Query
 
 ### Connection
 Connection to the database is handled automtically for you if you have the conenction information in a configfile or set as environment variables.
@@ -220,46 +218,63 @@ def create_app():
 
 ```
 ### Query objects
-To simplify queries to the database you can use the mongeasy query object. You construct it and make your query using normal python syntax.
+Mongeasy simplifies the process of creating complex database queries by using the Query object. This object allows you to use Python-like syntax for creating your queries, making it easier and more intuitive than using traditional MongoDB queries.
 
-Instead of using a mongodb query like this
+For instance, consider the following MongoDB query:
+
 ```python
 query = {'$or': [{'$or': [{'name': {'$eq': 'John'}}, {'age': {'$lt': 40}}]}, {'$and': [{'name': {'$eq': 'Jane'}}, {'age': {'$gt': 20}}]}]}
 ```
 
-you can accomplish the same thing by using the Query object
+You can achieve the same result using the Query object:
 
 ```python
 from mongeasy.core import Query
-
 
 query = Query('(name == "John" or age < 40) or (name == "Jane" and age > 20)')
 ```
 
-The query can then be used in your queries like this:
+This query can then be used in your database queries like this:
 
 ```python
 from mongeasy import create_document_class
 from mongeasy.core import Query
-
 
 User = create_document_class('User', 'users')
 query = Query('(name == "John" or age < 40) or (name == "Jane" and age > 20)')
 result = User.find(query)
 ```
 
-Supported operators are:
-* ==
-* !=
-* <
-* \>
-* <=
-* \>=
-* and
-* or
-* not
-* in
-* not in
+Mongeasy supports the following operators in the Query object:
+
+* `==`: equality
+* `!=`: inequality
+* `<`: less than
+* `>`: greater than
+* `<=`: less than or equal to
+* `>=`: greater than or equal to
+* `and`: logical AND
+* `or`: logical OR
+* `not`: logical NOT
+* `in`: check if a value is in a list
+* `not in`: check if a value is not in a list
+
+You can also access subdocuments or nested fields in your documents using the dot notation:
+
+```python
+query = Query('age > 25 and friends.age == 32')
+```
+
+In case of invalid queries, an error will be raised with detailed information about the problem:
+
+```python
+try:
+    query = Query("age <> 25")  # Invalid operator
+except ValueError as e:
+    print(e)
+```
+
+This approach makes it easier to write, read, and manage your database queries in Python, providing a more user-friendly interface for MongoDB.
 
 ### ResultList
 All queries that can return more than one document will return a `ResultList` object. This object can be used to get the first or last document in the list, or None if no document is found.

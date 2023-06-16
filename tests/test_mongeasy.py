@@ -274,3 +274,88 @@ def test_document_document_count(clean_mongo):
     count = User.document_count()
     assert count == 3
 
+
+####################
+# Test Query Class #
+####################
+from mongeasy.core import Query
+
+def test_eq():
+    query = Query('name == "John"')
+    assert query.to_mongo_query() == {'name': {'$eq': 'John'}}
+
+def test_ne():
+    query = Query('name != "John"')
+    assert query.to_mongo_query() == {'name': {'$ne': 'John'}}
+
+def test_lt():
+    query = Query('age < 30')
+    assert query.to_mongo_query() == {'age': {'$lt': 30}}
+
+def test_gt():
+    query = Query('age > 30')
+    assert query.to_mongo_query() == {'age': {'$gt': 30}}
+
+def test_lte():
+    query = Query('age <= 30')
+    assert query.to_mongo_query() == {'age': {'$lte': 30}}
+
+def test_gte():
+    query = Query('age >= 30')
+    assert query.to_mongo_query() == {'age': {'$gte': 30}}
+
+def test_and():
+    query = Query('name == "John" and age < 30')
+    assert query.to_mongo_query() == {'$and': [{'name': {'$eq': 'John'}}, {'age': {'$lt': 30}}]}
+
+def test_or():
+    query = Query('name == "John" or age < 30')
+    assert query.to_mongo_query() == {'$or': [{'name': {'$eq': 'John'}}, {'age': {'$lt': 30}}]}
+
+def test_complex():
+    query = Query('(name == "John" or age < 30) or (name == "Jane" and age > 20)')
+    assert query.to_mongo_query() == {'$or': [{'$or': [{'name': {'$eq': 'John'}}, {'age': {'$lt': 30}}]}, {'$and': [{'name': {'$eq': 'Jane'}}, {'age': {'$gt': 20}}]}]}
+
+def test_subdocument_eq():
+    query = Query('friends.age == 32')
+    assert query.to_mongo_query() == {'friends.age': {'$eq': 32}}
+
+def test_subdocument_ne():
+    query = Query('friends.age != 32')
+    assert query.to_mongo_query() == {'friends.age': {'$ne': 32}}
+
+def test_subdocument_and():
+    query = Query('age > 25 and friends.age == 32')
+    assert query.to_mongo_query() == {'$and': [{'age': {'$gt': 25}}, {'friends.age': {'$eq': 32}}]}
+
+def test_subdocument_or():
+    query = Query('age > 25 or friends.age == 32')
+    assert query.to_mongo_query() == {'$or': [{'age': {'$gt': 25}}, {'friends.age': {'$eq': 32}}]}
+
+def test_subdocument_complex():
+    query = Query('(age > 25 and friends.age == 32) or (name == "Jane" and friends.name == "John")')
+    assert query.to_mongo_query() == {'$or': [{'$and': [{'age': {'$gt': 25}}, {'friends.age': {'$eq': 32}}]}, {'$and': [{'name': {'$eq': 'Jane'}}, {'friends.name': {'$eq': 'John'}}]}]}
+
+def test_invalid_query_string():
+    with pytest.raises(ValueError) as excinfo:
+        q = Query("age >> 25")  # Invalid operator
+        q.to_mongo_query()
+    assert "Invalid query string" in str(excinfo.value)
+
+def test_invalid_operator():
+    with pytest.raises(ValueError) as excinfo:
+        q = Query("age <> 25")  # Invalid operator
+        q.to_mongo_query()
+    assert "Invalid query string" in str(excinfo.value)
+
+def test_invalid_variable():
+    with pytest.raises(ValueError) as excinfo:
+        q = Query("25 > 25")  # Invalid variable (number instead of a string)
+        q.to_mongo_query()
+    assert "Invalid query string" in str(excinfo.value)
+
+def test_unmatched_parentheses():
+    with pytest.raises(ValueError) as excinfo:
+        q = Query("(age > 25 and (name == 'John'")  # Unmatched parentheses
+        q.to_mongo_query()
+    assert "Invalid query string" in str(excinfo.value)

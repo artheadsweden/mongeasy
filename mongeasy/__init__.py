@@ -7,6 +7,7 @@ __version__ = '0.1.8'
 from mongeasy.connection import MongeasyConnection
 from mongeasy.exceptions import MongeasyDBConnectionError
 from mongeasy.dynamics import create_document_class
+from mongeasy.core import Query
 
 connection = MongeasyConnection()
 
