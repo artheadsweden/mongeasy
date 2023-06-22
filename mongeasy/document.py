@@ -24,11 +24,13 @@ from typing import Union, List, Dict, Any
 import logging
 import json
 import bson
-from .exceptions import MongeasyDBCollectionError, MongeasyFieldError, MongeasyDBDocumentError, MongeasyIndexException
-from .base_dict import BaseDict
-from .core import Query
-from .resultlist import ResultList
+from mongeasy.exceptions import MongeasyDBCollectionError, MongeasyFieldError, MongeasyDBDocumentError, MongeasyIndexException
+from mongeasy.plugins.registry import Hook, plugin_dispatcher
+from mongeasy.base_dict import BaseDict
+from mongeasy.core import Query
+from mongeasy.resultlist import ResultList
 import pymongo
+
 
 class Document(BaseDict):
     """
@@ -36,11 +38,18 @@ class Document(BaseDict):
     will represent a single document
     """
     collection = None
+    registry = None
     logger = logging.getLogger('mongeasy')
 
-    def __init__(self, *args, **kwargs):
+    @plugin_dispatcher([
+        {'hook': Hook.BEFORE_INIT_DOCUMENT, 'when': 'pre'},
+        {'hook': Hook.AFTER_INIT_DOCUMENT, 'when': 'post'},
+        {'hook': Hook.VALIDATE_DOCUMENT, 'when': 'pre'},
+        
+    ])
+    def __init__(self, *args,  **kwargs):
         super().__init__()
-
+        
         # Handle positional arguments
         if len(args) == 1 and isinstance(args[0], dict):
             as_dict = copy(args[0])
@@ -88,7 +97,12 @@ class Document(BaseDict):
         :return: bool, True if the document has been saved, False otherwise
         """
         return not bool(self.has_changed())
-
+    
+    @plugin_dispatcher([
+        {'hook': Hook.BEFORE_SAVE_DOCUMENT, 'when': 'pre'},
+        {'hook': Hook.AFTER_SAVE_DOCUMENT, 'when': 'post'},
+        {'hook': Hook.VALIDATE_DOCUMENT, 'when': 'pre'},
+        ])
     def save(self):
         """
         Saves the current object to the database
@@ -98,15 +112,25 @@ class Document(BaseDict):
             Document.logger.error("The collection does not exist")
             raise MongeasyDBCollectionError('The collection does not exist')
 
+        # Call the before_save hook
+        # if self.registry:
+        #     self.registry.dispatch(Hook.BEFORE_SAVE_DOCUMENT, self)
+
+
         # If _id is None, this is a new document
         if self._id is None:
             del self._id
             res = self.collection.insert_one(self.__dict__)
             self._id = res.inserted_id
+            
+            # if self.registry:
+            #     self.registry.dispatch(Hook.AFTER_SAVE_DOCUMENT, self)
             return self
 
         # if no fields have changed, return the document unchanged
         if not (changed_fields := self.has_changed()):
+            # if self.registry:
+            #     self.registry.dispatch(Hook.AFTER_SAVE_DOCUMENT, self)
             return self
 
         # update the document
@@ -115,6 +139,8 @@ class Document(BaseDict):
             Document.logger.error(f"Document with _id {self._id} does not exist")
             raise MongeasyDBDocumentError(f"Document with _id {self._id} does not exist")
         else:
+            # if self.registry:
+            #     self.registry.dispatch(Hook.AFTER_SAVE_DOCUMENT, self)
             return self
 
     def reload(self):
@@ -152,6 +178,10 @@ class Document(BaseDict):
         else:
             Document.logger.info(f"Field '{field}' deleted from document with id '{self._id}'")
 
+    @plugin_dispatcher([
+        {'hook': Hook.BEFORE_DELETE_DOCUMENT, 'when': 'pre'},
+        {'hook': Hook.AFTER_DELETE_DOCUMENT, 'when': 'post'},
+        ])
     def delete(self):
         """
         Delete the current object from the database
@@ -258,6 +288,10 @@ class Document(BaseDict):
                 Document.logger.exception(f"Error inserting item: {item}. Exception: {e}")
 
     @classmethod
+    @plugin_dispatcher([
+        {'hook': Hook.BEFORE_QUERY_DOCUMENT, 'when': 'pre'},
+        {'hook': Hook.AFTER_QUERY_DOCUMENT, 'when': 'post'},
+        ])
     def find(cls, *args, **kwargs):
         """
         Find a document that matches the keywords
@@ -303,7 +337,11 @@ class Document(BaseDict):
             yield cls(**item)
 
     @classmethod
-    def delete(cls, *args, **kwargs) -> None:
+    @plugin_dispatcher([
+        {'hook': Hook.BEFORE_DELETE_DOCUMENT, 'when': 'pre'},
+        {'hook': Hook.AFTER_DELETE_DOCUMENT, 'when': 'post'},
+    ])
+    def delete_many(cls, *args, **kwargs) -> None:
         """
         Delete the document that matches the keywords
 

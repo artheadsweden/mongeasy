@@ -22,6 +22,7 @@ from typing import Union
 from .utils.utils import pascal_to_snake
 from .document import Document
 from .exceptions import MongeasyValidationException, MongeasyFieldError
+from .plugins.registry import PluginRegistry
 
 
 def create_document_class(class_name: str, collection_name: str = None, base_classes: tuple = ()):
@@ -47,8 +48,8 @@ def create_document_class(class_name: str, collection_name: str = None, base_cla
     
     # Create the collection object
     collection = connection.db[collection_name]
-    
-    doc_class = type(class_name, base_classes + (Document, ), {'collection':collection})
+    from mongeasy import registry
+    doc_class = type(class_name, base_classes + (Document, ), {'collection':collection, 'registry':registry})
 
     # Register the document class in the calling module's namespace
     setattr(calling_module, class_name, doc_class)

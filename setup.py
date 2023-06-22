@@ -9,8 +9,8 @@ with open("LICENSE", encoding="utf8") as f:
     license = f.read()
 
 setup(
-    name="Mongeasy",
-    version="0.1.9",
+    name="mongeasy",
+    version="0.2.0",
     author="Joakim Wassberg",
     author_email="joakim.wassberg@arthead.se",
     description="Easy to use wrapper around pymongo for easy access to MongoDB.",

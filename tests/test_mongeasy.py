@@ -7,9 +7,8 @@ os.environ['MONGOEASY_CONNECTION_STRING'] = 'mongodb://localhost:27017'
 os.environ['MONGOEASY_DATABASE_NAME'] = 'mongeasy_pytest'
 from pymongo import MongoClient
 import pytest
-
-
 from mongeasy import create_document_class
+from mongeasy.exceptions import MongeasyDBDocumentError
 
 
 @pytest.fixture(scope='function')
@@ -160,9 +159,10 @@ def test_document_delete_existing_document(clean_mongo):
 def test_document_delete_unsaved_document(clean_mongo):
     User = create_document_class('User', 'users')
     user = User({'first_name': 'John', 'last_name': 'Doe', 'age': 30})
-    user.delete()
-    stored_user = User.find({'first_name': 'John'}).first()
-    assert stored_user is None
+    with pytest.raises(MongeasyDBDocumentError):
+        user.delete()
+        stored_user = User.find({'first_name': 'John'}).first()
+        assert stored_user is None
 
 
 def test_document_to_json(clean_mongo):
@@ -255,7 +255,7 @@ def test_document_delete(clean_mongo):
     user2.save()
     user3 = User({'first_name': 'Bob', 'last_name': 'Jones', 'age': 35})
     user3.save()
-    User.delete({'first_name': 'Alice'})
+    User.delete_many({'first_name': 'Alice'})
     stored_users = User.all()
     assert len(stored_users) == 2
     assert user1.first_name in [user.first_name for user in stored_users]

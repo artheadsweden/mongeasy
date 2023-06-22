@@ -47,6 +47,7 @@ class Query:
         # Define the operators
         operators = ['>=', '<=', '==', '!=', 'in', 'not in', '<', '>']
         condition = Group(variable + Or(map(Literal, operators)) + value)       
+        
         # Define the operators
         expr = Forward()
         and_ = Literal('and')
@@ -55,7 +56,6 @@ class Query:
         expr << infixNotation(condition, [(not_, 1, opAssoc.RIGHT, lambda t: {'$not': t[0][0]}), 
                                           (and_, 2, opAssoc.LEFT, lambda t: {'$and': [t[0][0], t[0][2]]}), 
                                           (or_, 2, opAssoc.LEFT, lambda t: {'$or': [t[0][0], t[0][2]]})])
-
 
         try:
             # Parse the query
@@ -69,17 +69,7 @@ class Query:
         except Exception as e:
             raise ValueError(f"Failed to convert parsed query to MongoDB query. Reason: {str(e)}")
 
-        return mongo_query
-    
-
-    # def to_mongo_query(self):
-    #     try:
-    #         # ...rest of your code...
-    #         parsed_query = expr.parseString(self.query_str, parseAll=True)[0]
-    #         # ...rest of your code...
-    #     except ParseException as e:
-    #         raise ValueError(f"Invalid query string: {self.query_str}. Reason: {str(e)}")
-        
+        return mongo_query   
 
     def _to_mongo_query_rec(self, parsed_query):
         if isinstance(parsed_query, str):
