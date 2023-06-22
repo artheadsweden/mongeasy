@@ -2,6 +2,11 @@
 
 from setuptools import setup, find_packages
 
+def parse_requirements(filename):
+    with open(filename, 'r') as file:
+        return file.read().splitlines()
+
+
 with open("README.md", encoding="utf8") as f:
     readme = f.read()
 
@@ -10,7 +15,7 @@ with open("LICENSE", encoding="utf8") as f:
 
 setup(
     name="mongeasy",
-    version="0.2.0",
+    version="0.2.1",
     author="Joakim Wassberg",
     author_email="joakim.wassberg@arthead.se",
     description="Easy to use wrapper around pymongo for easy access to MongoDB.",
@@ -30,5 +35,5 @@ setup(
         "Topic :: Database",
     ],
     packages=find_packages(),
-    install_requires=["pymongo>=4.3.3"],
+    install_requires=parse_requirements('requirements.txt'),
 )
