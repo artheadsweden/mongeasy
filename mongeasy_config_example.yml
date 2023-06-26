@@ -1,0 +1,6 @@
+db_config:
+  uri: mongodb://localhost:27017
+  database: my_database
+
+# plugins:
+  # - mongeasy_plugin.beforesave.BeforeSavePlugin

@@ -54,14 +54,18 @@ class MongeasyConnection:
             # Read the configuration from the file
             with open(config_path, 'r') as f:
                 config = yaml.safe_load(f)
+                if config is None:
+                    config = {}
                 db_config = config.get('db_config', {})
 
-            if self.uri is None:
-                self.uri = db_config.get('uri', None)
-            if self.database is None:
-                self.database = db_config.get('database', None)
-            if self.connection_options is None:
-                self.connection_options = db_config.get('connection_options', None)
+            if db_config != {}:
+    
+                if self.uri is None:
+                    self.uri = db_config.get('uri', None)
+                if self.database is None:
+                    self.database = db_config.get('database', None)
+                if self.connection_options is None:
+                    self.connection_options = db_config.get('connection_options', None)
 
             # Handle plugins
             from mongeasy import registry

@@ -33,3 +33,4 @@ pytest_cache/
 driver.py
 mongeasy_config.yaml
 p.conf
+set_env.py
