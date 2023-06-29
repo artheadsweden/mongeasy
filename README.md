@@ -16,7 +16,7 @@ pip install mongeasy
 ## Documentation
 The documentation can be found at [https://mongeasy.readthedocs.io](https://mongeasy.readthedocs.io)
 
-## What's new in version 0.2.2?
+## What's new in version 0.2.3?
 ### Support for lazy queries
 The find method now supports a lazy flag (defeault set to False) which when set to True, returns a lazy query object instead of a result list. This is useful when you want to iterate over a large number of documents without loading them all into memory at once.
 
