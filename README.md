@@ -1,6 +1,10 @@
 # Mongeasy
 
-Mongeasy is a easy to use library to be used for simple access to a MongoDB database, without any need for schemas or validation. Just store the data as it is used in your application.
+Mongeasy is a powerful yet easy-to-use Python library for interacting with MongoDB databases. Embracing the dynamic nature of Python and MongoDB, Mongeasy eliminates the need for rigid schemas and validation layers. This means you can store and handle data in its natural form, just as it is used in your application, enhancing code readability and efficiency.
+
+However, Mongeasy's flexibility doesn't mean it compromises on control. With its built-in plugin system, you can hook into the lifecycle of a document and the database connection, enabling advanced features like data validation, logging, and more as per your application's requirements.
+
+Whether you're developing a small personal project or a large-scale production application, Mongeasy helps you focus more on your application logic, and less on managing your database. Experience the freedom of schema-less design with the power of customization, all bundled in a single, user-friendly package.
 
 ## Installation
 Mongoeasy is available on PyPI and can be installed using pip:
@@ -24,7 +28,7 @@ The class method `delete` has been renamed to `delete_many` as the name conflict
 --------------------
 
 ## Connection
-Connection to the database is handled automtically for you if you have the conenction information in a configfile or set as environment variables.
+Connection to the database is handled automatically for you if you have the connection information in a configfile or set as environment variables.
 
 ### Connection using configfile
 Create a file called `mongeasy_config.yml` and place it in your project root folder.
@@ -45,37 +49,30 @@ MONGOEASY_CONNECTION_STRING=mongodb://localhost:27017/
 MONGOEASY_DATABASE_NAME=mydatabase
 ```
 
-## Create a document class
-To use Mongeasy you will create a document class that can be used with the collection of choice. To do this you will use the `create_document_class` factory function like this:
+Absolutely, here's a revised version of your examples section:
+
+---
+
+## Create a Document Class
+
+In Mongeasy, you interact with your MongoDB collections through document classes. A document class is a Python class that represents a MongoDB collection and provides methods for interacting with that collection.
+
+You can create a document class using the `create_document_class` factory function. The first argument is the name you want to give to the class (which should be the singular form of the collection name), and the second argument is the name of the MongoDB collection that the class will interact with.
 
 ```python
 from mongeasy import create_document_class
-
 
 User = create_document_class('User', 'users')
-
 ```
 
-The first argument is the name the class will get and the second argument is the name of the collection to use. If the collection does not exist it will be created when you use the class to store documents.
+After running this code, `User` becomes a new class that you can use to interact with the 'users' collection in your MongoDB database.
 
-You will not need to assign the returned value to a class variable as in the example above, as the generated class is injected into the current namespace:
+## Create and Store a Document
+
+Once you have a document class, you can use it to create new documents in your MongoDB collection. You can create a document using keyword arguments or by passing a dictionary. After creating a document, you can save it to your MongoDB collection using the `save` method.
 
 ```python
 from mongeasy import create_document_class
-
-
-create_document_class('User', 'users')
-
-# The class User exist from this point in the code
-
-```
-
-## Create a store a document
-You can create a documnet by using the generated class. You can either use keyword arguments or pass a dict.
-
-```python
-from mongeasy import create_document_class
-
 
 User = create_document_class('User', 'users')
 
@@ -83,87 +80,71 @@ User = create_document_class('User', 'users')
 user1 = User(name='Alice', age=25)
 user1.save()
 
-# Create a document using a dict
+# Create a document using a dictionary
 user2 = User({'name': 'Bob', 'age': 30})
 user2.save()
-
 ```
 
-## Find documents
-You can find documents using the `find` method on the generated class. This method will return a list of documents.
+In this example, `user1` and `user2` are instances of the `User` document class. When you call the `save` method on these instances, Mongeasy automatically inserts them into the 'users' collection in your MongoDB database.
+
+## Find Documents
+
+You can retrieve documents from your MongoDB collection using the `find` method on your document class. This method returns a `ResultList` object that contains the found documents.
 
 ```python
 from mongeasy import create_document_class
 
-
 User = create_document_class('User', 'users')
 
-# Find all documents
+# Find all documents in the 'users' collection
 users = User.all()
 
 # Find all documents with age 25
 users = User.find({'age': 25})
-
 ```
-### Find one document
-You can find one document using the `find` method on the generated class.
 
-Find will return a ResultList object that can be used to get the first, or last, document in the list. If no document is found None is returned.
+In the first `find` example, Mongeasy returns all documents in the 'users' collection. In the second example, Mongeasy only returns documents where the 'age' field is 25.
+
+## Update a Document
+
+You can update a document by changing its attributes and then calling the `save` method. Mongeasy automatically updates the corresponding document in your MongoDB collection.
 
 ```python
 from mongeasy import create_document_class
-
 
 User = create_document_class('User', 'users')
 
 # Find one document with age 25
 user = User.find({'age': 25}).first()
 
-if user is None:
-    print('No user found')
-
-```
-
-## Update a document
-You can update a document just by changing the attributes and then calling the `save` method.
-
-```python
-from mongeasy import create_document_class
-
-
-User = create_document_class('User', 'users')
-
-# Find one document with age 25
-user = User.find({'age': 25}).first()
-
-if user is None:
-    print('No user found')
-else:
+if user is not None:
     # Update the age of the user
     user.age = 26
     user.save()
 ```
 
-## Delete a document
-You can delete a document by calling the `delete` method on the document.
+In this example, Mongeasy first retrieves the document where the 'age' field is 25. Then, it changes the 'age' field of the document to 26 and saves the document back to the MongoDB collection.
+
+## Delete a Document
+
+You can remove a document from your MongoDB collection by calling the `delete` method on an instance of your document class.
 
 ```python
 from mongeasy import create_document_class
-
 
 User = create_document_class('User', 'users')
 
 # Find one document with age 25
 user = User.find({'age': 25}).first()
 
-if user is None:
-    print('No user found')
-else:
-    # Delete the user
+if user is not None:
     user.delete()
 ```
 
-You can also delete all documents in a collection by calling the `delete` method on the generated class.
+In this example, Mongeasy first retrieves the document where the 'age' field is 25. Then, it deletes that document from the 'users' collection in your MongoDB database.
+
+
+You can also delete all documents in a collection by calling the `delete_many` class method on the generated class.
 
 ```python
 from mongeasy import create_document_class
@@ -173,12 +154,15 @@ User = create_document_class('User', 'users')
 
 
 # Delete using a filter
-User.delete({'age': 25})
+User.delete_many({'age': 25})
 
 # Delete all documents in the collection
-User.delete()
+User.delete_many()
 ```
 
+The `delete_many`method is useful when you want to delete multiple documents at once. The first call above deletes all users with age 25, and the second call deletes all users in the collection. 
+
+---
 ## Indexes
 You can create indexes on the collection by using the `create_index` method on the generated class.
 
