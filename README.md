@@ -16,13 +16,23 @@ pip install mongeasy
 ## Documentation
 The documentation can be found at [https://mongeasy.readthedocs.io](https://mongeasy.readthedocs.io)
 
-## What's new in version 0.2.0?
-### New plugin system
-Mongeasy now has a plugin system that allows you to hook into the lifecycle of a document and the database connection. This allows you to do things like validation, logging, and more.
+## What's new in version 0.2.2?
+### Support for lazy queries
+The find method now supports a lazy flag (defeault set to False) which when set to True, returns a lazy query object instead of a result list. This is useful when you want to iterate over a large number of documents without loading them all into memory at once.
 
-See documentation for this feature below.
+```python
+from mongeasy import create_document_class
 
-### Breaking changes
+User = create_document_class('User', 'users')
+
+# Find all documents in the 'users' collection
+users = User.all(lazy=True)
+
+# Find all documents with age 25
+users = User.find({'age': 25}, lazy=True)
+```
+
+### Breaking changes (0.2.0)
 The class method `delete` has been renamed to `delete_many` as the name conflicted with the instance method `delete`.
 
 --------------------
@@ -104,6 +114,21 @@ users = User.find({'age': 25})
 ```
 
 In the first `find` example, Mongeasy returns all documents in the 'users' collection. In the second example, Mongeasy only returns documents where the 'age' field is 25.
+
+Find also has a lazy flag (defeault set to False) which when set to True, returns a lazy query object instead of a result list. This is useful when you want to iterate over a large number of documents without loading them all into memory at once.
+
+```python
+from mongeasy import create_document_class
+
+User = create_document_class('User', 'users')
+
+# Find all documents in the 'users' collection
+users = User.all(lazy=True)
+
+# Find all documents with age 25
+
+users = User.find({'age': 25}, lazy=True)
+```
 
 ## Update a Document
 
@@ -269,7 +294,7 @@ except ValueError as e:
 This approach makes it easier to write, read, and manage your database queries in Python, providing a more user-friendly interface for MongoDB.
 
 ## ResultList
-All queries that can return more than one document will return a `ResultList` object. This object can be used to get the first or last document in the list, or None if no document is found.
+All queries that can return more than one document will return a `ResultList` object, if not the lazy flag has been set. This object can be used to get the first or last document in the list, or None if no document is found.
 
 
 ```python
@@ -296,6 +321,25 @@ There are also other methods on the `ResultList` object that can be used. These 
 * `reduce` - Apply a given function to each element in the list and return a single value
 * `group_by` - Group the list by a given key and return a dict with the results grouped by the key
 * `random` - Get a random document from the list or None if no document is found
+
+
+If lazy loading is enabled a LazyResultList. LazyResultList is a lazy version of Result list. It will cache the result of the query and only load the documents when they are accessed. This can be useful if you want to load the documents later or if you want to use the list in a for loop.
+
+Methods in the LazyResultList are
+* `first` - Get the first document in the list 
+* `next` - Get the next document in the list 
+
+Note that LazyResultList uses the PyMongo cursor generator. If you want to access the cursor directly you can use the `raw_query` method on the Document class.
+
+```python
+from mongeasy import create_document_class
+
+
+User = create_document_class('User', 'users')
+
+# Find one document with age 25
+users = User.raw_query({'age': 25})
+```
 
 ## Mongeasy Plugin System
 
@@ -420,8 +464,8 @@ plugins:
 As always, when developing a plugin, remember to respect the privacy and security of the user's data.
 
 ## Planned features
-* Enable lazy-loading of query results and support for query chaining
-* Implement a schema plugin system to allow for validation and type checking of documents
+* ~~Enable lazy-loading of query results and support for query chaining~~
+* ~~Implement a schema plugin system to allow for validation and type checking of documents~~
 * Add support for transactions using resource management
 * Implement logging and profiling to aid with debugging and performance tuning
 * Enable asynchronous I/O support for improved scalability

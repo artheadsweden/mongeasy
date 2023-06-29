@@ -85,5 +85,22 @@ for user in User.all_iter():
     print(user)
 ```
 
+### Lazy Querying
+The find method has a lazy flag which can be set to True to make the query lazy. This means that the query will not be executed until the results are iterated over. This can be useful if you want to add more conditions to the query after it has been created.
+
+```python
+from mongeasy import create_document_class
+
+
+User = create_document_class('User', 'users')
+
+# Create a lazy query
+users = User.find(lazy=True)
+
+# Add conditions to the query
+users = User.find(lazy=True, age=25)
+```
+
+
 
 

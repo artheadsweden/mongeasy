@@ -9,6 +9,8 @@ from pymongo import MongoClient
 import pytest
 from mongeasy import create_document_class
 from mongeasy.exceptions import MongeasyDBDocumentError
+from mongeasy.resultlist import ResultList
+from mongeasy.lazy_resultlist import LazyResultList
 
 
 @pytest.fixture(scope='function')
@@ -359,3 +361,39 @@ def test_unmatched_parentheses():
         q = Query("(age > 25 and (name == 'John'")  # Unmatched parentheses
         q.to_mongo_query()
     assert "Invalid query string" in str(excinfo.value)
+
+
+####################
+# Test Lazyness    #
+####################
+
+def test_lazy_result_list(clean_mongo):
+    client = MongoClient('mongodb://localhost:27017')
+    db = client['mongeasy_pytest']
+    collection = db['users']
+    documents = [{'name': f'user{i}', 'age': i} for i in range(10)]
+    collection.insert_many(documents)
+    User = create_document_class('User', 'users')
+    cursor = collection.find({})
+    lazy_result_list = LazyResultList(cursor, User)
+
+    # Test that we can iterate over the LazyResultList
+    for i, document in enumerate(lazy_result_list):
+        assert document['name'] == f'user{i}'
+        assert document['age'] == i
+
+ 
+def test_lazy_result_list_with_query(clean_mongo):
+    client = MongoClient('mongodb://localhost:27017')
+    db = client['mongeasy_pytest']
+    collection = db['users']
+    documents = [{'name': f'user{i}', 'age': i} for i in range(10)]
+    collection.insert_many(documents)
+    User = create_document_class('User', 'users')
+    q = Query('age > 5')
+    lazy_result_list = User.find(q, lazy=True)
+
+    # Test that we can iterate over the LazyResultList
+    for i, document in enumerate(lazy_result_list):
+        assert document['name'] == f'user{i+6}'
+        assert document['age'] == i+6

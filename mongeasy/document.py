@@ -29,6 +29,7 @@ from mongeasy.plugins.registry import Hook, plugin_dispatcher
 from mongeasy.base_dict import BaseDict
 from mongeasy.core import Query
 from mongeasy.resultlist import ResultList
+from mongeasy.lazy_resultlist import LazyResultList
 import pymongo
 
 
@@ -292,12 +293,13 @@ class Document(BaseDict):
         {'hook': Hook.BEFORE_QUERY_DOCUMENT, 'when': 'pre'},
         {'hook': Hook.AFTER_QUERY_DOCUMENT, 'when': 'post'},
         ])
-    def find(cls, *args, **kwargs):
+    def find(cls, *args, lazy=False, **kwargs):
         """
         Find a document that matches the keywords
         :param arg: positional arguments
+        :param lazy: Whether to use lazy loading. Default is False.
         :param kwargs: keyword arguments or dict to match
-        :return: ResultList
+        :return: ResultList or LazyResultList
         """
         # Handle positional arguments
         if len(args) == 1 and isinstance(args[0], dict):
@@ -307,7 +309,12 @@ class Document(BaseDict):
         elif len(args) == 0:
             as_dict = copy(kwargs)
 
-        return ResultList(cls(item) for item in cls.collection.find(as_dict))
+        cursor = cls.collection.find(as_dict)
+        if lazy:
+            return LazyResultList(cursor, cls)
+        else:
+            return ResultList(cls(item) for item in cursor)
+
 
     @classmethod
     def find_in(cls, field:str, values:list) -> ResultList:
