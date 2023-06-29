@@ -12,7 +12,6 @@ import-string==0.1.0
 importlib-metadata==6.4.1
 iniconfig==2.0.0
 jaraco.classes==3.2.3
-Jinja2==2.11.3
 keyring==23.13.1
 Markdown==3.3.7
 markdown-it-py==2.2.0
@@ -23,6 +22,7 @@ mkdocs==1.4.2
 more-itertools==9.1.0
 packaging==23.1
 pkginfo==1.9.6
+pluggy==1.2.0
 pydantic==1.10.9
 Pygments==2.15.0
 pymongo==4.3.3

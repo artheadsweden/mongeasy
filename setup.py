@@ -15,7 +15,7 @@ with open("LICENSE", encoding="utf8") as f:
 
 setup(
     name="mongeasy",
-    version="0.2.2",
+    version="0.2.4",
     author="Joakim Wassberg",
     author_email="joakim.wassberg@arthead.se",
     description="Easy to use wrapper around pymongo for easy access to MongoDB.",
